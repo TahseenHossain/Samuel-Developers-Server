@@ -30,10 +30,18 @@ async function run() {
     //await client.connect();
 
     const userCollection = client.db("samuelDevelopersDB").collection("user");
-    const propertiesCollection = client.db("samuelDevelopersDB").collection("properties");
-    const servicesCollection = client.db("samuelDevelopersDB").collection("services");
-    const testimonialsCollection = client.db("samuelDevelopersDB").collection("testimonials");
-    const workSheetCollection = client.db("samuelDevelopersDB").collection("workSheet");
+    const propertiesCollection = client
+      .db("samuelDevelopersDB")
+      .collection("properties");
+    const servicesCollection = client
+      .db("samuelDevelopersDB")
+      .collection("services");
+    const testimonialsCollection = client
+      .db("samuelDevelopersDB")
+      .collection("testimonials");
+    const workSheetCollection = client
+      .db("samuelDevelopersDB")
+      .collection("workSheet");
     const payCollection = client.db("samuelDevelopersDB").collection("pay");
 
     app.post("/jwt", async (req, res) => {
@@ -64,10 +72,10 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/user", async (req, res) => {
-      const result = await userCollection.find().toArray();
-      res.send(result);
-    });
+    // app.get("/user", async (req, res) => {
+    //   const result = await userCollection.find().toArray();
+    //   res.send(result);
+    // });
 
     app.get("/workSheet", async (req, res) => {
       const result = await workSheetCollection.find().toArray();
@@ -80,10 +88,11 @@ async function run() {
     });
 
     app.get("/pay/:email", async (req, res) => {
-      const result = await payCollection.find().toArray();
+      const email = req.params.email;
+      const result = await payCollection.find({ email }).toArray();
       res.send(result);
     });
-    
+
     app.post("/user", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
@@ -102,47 +111,45 @@ async function run() {
       res.send(result);
     });
 
-    app.patch('/user/role/:id', async (req, res) => {
+    app.patch("/user/role/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateUser = req.body;
- 
+
       const updateDoc = {
         $set: {
           role: updateUser.role,
         },
       };
-    
+
       const result = await userCollection.updateOne(filter, updateDoc);
     });
 
-    app.patch('/user/verified/:id', async (req, res) => {
+    app.patch("/user/verified/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updateUser = req.body;
-    
+
       const updateDoc = {
         $set: {
           verified: updateUser.verified,
         },
       };
-    
+
       const result = await userCollection.updateOne(filter, updateDoc);
     });
 
-    app.post('/workSheet', async(req, res) => {
+    app.post("/workSheet", async (req, res) => {
       const newElements = req.body;
       const result = await workSheetCollection.insertOne(newElements);
       res.send(result);
-  })
+    });
 
-
-  app.post('/pay', async(req, res) => {
-    const newElements = req.body;
-    const result = await payCollection.insertOne(newElements);
-    res.send(result);
-})
-    
+    app.post("/pay", async (req, res) => {
+      const newElements = req.body;
+      const result = await payCollection.insertOne(newElements);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     //await client.db("admin").command({ ping: 1 });
